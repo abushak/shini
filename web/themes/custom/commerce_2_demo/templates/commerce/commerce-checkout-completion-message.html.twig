@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Default theme implementation for the completion message.
+ *
+ * Available variables:
+ * - order_entity: The order entity.
+ * - payment_instructions: The payment instructions, if provided.
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="checkout-complete">
+  <span class="checkout-complete__order-number">{{ 'Your order number is '|t }} <strong>{{ order_entity.getOrderNumber }}</strong>.</span><br>
+  {{ 'You can view your order on your account page when logged in.'|t }} <br>
+
+  {% if payment_instructions %}
+    <div class="checkout-complete__payment-instructions">
+      <h2>{{ 'Payment instructions'|t }}</h2>
+      {{ payment_instructions }}
+    </div>
+  {% endif %}
+
+  {# Show files for digital order types. #}
+  {% if order_type.entity.id == 'digital' %}
+    <h2>{{ 'Your downloads'|t }}</h2>
+    <div class="checkout-complete__digital">
+      {% for order_item in order_items %}
+        {% for file in order_item.purchased_entity %}
+          <a href="{{ file_url(file.entity.field_file.entity.fileuri) }}" class="checkout-complete__file" title="{{ file.entity.title.value }}">
+            {{ file.entity.title.value }}
+          </a>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# For digital_recurring order types. #}
+  {% if order_type.entity.id == 'digital_recurring' %}
+    <h2>{{ 'Your subscription is active!'|t }}</h2>
+    <div class="checkout-complete__digital-recurring">
+      {% for order_item in order_items %}
+        {% for purchased_entity in order_item.purchased_entity %}
+
+          {# If uh_recurring_digital type. #}
+          {% if purchased_entity.entity.type.entity.id == 'uh_recurring_digital' %}
+            <table class="table">
+              <tbody>
+              <tr>
+                <td><strong>{{ 'Download'|t }}:</strong></td>
+                <td><a href="#" title="{{ 'Link for example purposes only'|t }}">{{ 'Click here'|t }}</a></td>
+              </tr>
+              <tr>
+                <td><strong>{{ 'License Key'|t }}:</strong></td>
+                <td>XXXX-XXXX-XXXX-1234</td>
+              </tr>
+              </tbody>
+            </table>
+            {% trans %}
+              <strong>Note:</strong> The software license key provided is for example purposes only. <a href="https://www.acromedia.com/contact-us" target="_blank" title="Go to Acro Media's contact page">Talk to us</a> about your recurring billing or license integration requirements.
+            {% endtrans %}
+          {% endif %}
+
+        {% endfor %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
